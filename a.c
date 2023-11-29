@@ -4,13 +4,15 @@
 #include <ctype.h>
 #include <math.h>
 
+#include "strbuf.h"
 struct strbuf
 {
-    int len;   
-    int alloc; 
+    int len;  
+    int alloc;
     char *buf;
 };
 
+// 初始化 sb 结构体，容量为 alloc。
 void strbuf_init(struct strbuf *sb, size_t alloc)
 {
     sb->len = 0;
@@ -19,25 +21,17 @@ void strbuf_init(struct strbuf *sb, size_t alloc)
     if (sb->buf == NULL)
     {
         fprintf(stderr, "内存分配失败\n");
-        exit(EXIT_FAILURE);
+        return;
     }
 }
 
 // 将字符串填充到 sb 中，长度为 len, 容量为 alloc。
 void strbuf_attach(struct strbuf *sb, void *str, size_t len, size_t alloc)
 {
-    if (alloc > sb->alloc)
-    {
-        sb->alloc = alloc;
-        sb->buf = (char *)realloc(sb->buf, alloc * sizeof(char));
-        if (sb->buf == NULL)
-        {
-            fprintf(stderr, "内存重新分配失败\n");
-            exit(EXIT_FAILURE);
-        }
-    }
-    sb->buf = (char *)str;
+    sb->alloc = alloc;
+
     sb->len = len;
+    sb->buf = (char *)str;
 }
 
 // 释放 sb 结构体的内存。
@@ -46,6 +40,7 @@ void strbuf_release(struct strbuf *sb)
     sb->alloc = 0;
     sb->len = 0;
     free(sb->buf);
+    sb->buf = NULL;
 }
 
 // 交换两个 strbuf。
@@ -89,4 +84,6 @@ int strbuf_cmp(const struct strbuf *first, const struct strbuf *second)
 void strbuf_reset(struct strbuf *sb)
 {
     sb->len = 0;
+    free(sb->buf);
+    sb->buf = NULL;
 }

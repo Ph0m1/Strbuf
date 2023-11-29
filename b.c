@@ -9,13 +9,12 @@ struct strbuf
     char *buf;
 };
 
-// 确保在 len 之后 strbuf 中至少有 extra 个字节的空闲空间可用。
 void strbuf_grow(struct strbuf *sb, size_t extra)
 {
     if (sb->alloc > sb->len + extra)
         return;
-    sb->buf = (char *)realloc(sb->buf, (sb->len + extra) * sizeof(char));
-    if (sb->buf = NULL)
+    sb->buf = (char *)realloc(sb->buf, (sb->len + extra+1) * sizeof(char));
+    if (sb->buf == NULL)
     {
         fprintf(stderr, "重新分配内存失败\n");
         return;
@@ -28,13 +27,14 @@ void strbuf_add(struct strbuf *sb, const void *data, size_t len)
 {
     strbuf_grow(sb, len);
     memcpy(sb->buf + sb->len, data, len);
-    sb->buf[sb->len + len] = '\0';
     sb->len += len;
+    sb->buf[sb->len] = '\0';
 }
 
 // 向 sb 追加一个字符 c。
 void strbuf_addch(struct strbuf *sb, int c)
 {
+    
     strbuf_add(sb, &c, 1);
 }
 
@@ -47,13 +47,13 @@ void strbuf_addstr(struct strbuf *sb, const char *s)
 // 向一个 sb 追加另一个 strbuf的数据。
 void strbuf_addbuf(struct strbuf *sb, const struct strbuf *sb2)
 {
-    strbuf_add(sb, sb->buf, sb->len);
+    strbuf_add(sb, sb2->buf, sb2->len);
 }
 
 // 设置 sb 的长度 len。
 void strbuf_setlen(struct strbuf *sb, size_t len)
 {
-    if (len < sb->alloc)
+    if(len>sb->alloc)
     {
         sb->buf = (char *)realloc(sb->buf, len * sizeof(char));
         sb->alloc = len * sizeof(char);
@@ -75,5 +75,9 @@ size_t strbuf_avail(const struct strbuf *sb)
 // 向 sb 内存坐标为 pos 位置插入长度为 len 的数据 data。
 void strbuf_insert(struct strbuf *sb, size_t pos, const void *data, size_t len)
 {
-    strbuf_add(sb->buf + pos, data, len);
+    strbuf_grow(sb, len);
+    memmove(sb->buf + pos + len, sb->buf + pos, sb->len - pos);
+    memcpy(sb->buf + pos, data, len);
+    sb->buf[sb->len + len] = '\0';
+    sb->len += len;
 }

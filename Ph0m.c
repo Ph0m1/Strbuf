@@ -213,6 +213,7 @@ void strbuf_remove(struct strbuf *sb, size_t pos, size_t len)
 // sb 增长 hint ? hint : 8192 大小， 然后将文件描述符为 fd 的所有文件内容追加到 sb 中。
 ssize_t strbuf_read(struct strbuf *sb, int fd, size_t hint)
 {
+    
     if (fd < 0)
     {
         return 0;
@@ -385,12 +386,12 @@ struct strbuf **strbuf_split_buf(const char *str, size_t len, int terminator, in
 
 // 判断一个 strbuf 是否以指定字符串开头
 // target_str : 目标字符串，str : 前缀字符串，strnlen : target_str 长度 ，前缀相同返回 true 失败返回 false
-bool strbuf_begin_judge(char *target_str, const char *str, int strnlen)
-{
-    if (str == NULL)
-        return true;
-    return memcmp(target_str, str, strlen(str)) == 0;
-}
+    bool strbuf_begin_judge(char *target_str, const char *str, int strnlen)
+    {
+        if (str == NULL)
+            return true;
+        return memcmp(target_str, str, strlen(str)) == 0;
+    }
 
 // 获取字符串从坐标 [begin, end) 的所有内容（可以分成引用和拷贝两个模式） 。
 //	target_str : 目标字符串，begin : 开始下标，end 结束下标。
